@@ -1,7 +1,53 @@
 #!/usr/bin/env python3
 """
-财富流游戏主程序
+财富流游戏主程序 - Cash Flow Game Main Entry
 基于《富爸爸穷爸爸》理念的财务教育游戏
+
+文件功能概述：
+==============
+本文件是整个财富流游戏的主入口点，负责游戏的启动、初始化和玩家设置。
+提供了一个完整的图形化启动器界面，让用户可以方便地配置游戏参数并开始游戏。
+
+主要组件：
+----------
+1. GameLauncher类 - 主启动器窗口
+   - 提供友好的图形化界面
+   - 玩家数量设置（2-6人）
+   - 快速开始和详细设置选项
+   - 游戏规则说明展示
+   - 职业数据加载和管理
+
+2. PlayerSetupDialog类 - 玩家设置对话框
+   - 详细的玩家信息配置
+   - 姓名和职业选择
+   - 滚动界面支持多玩家设置
+
+核心功能：
+----------
+- 游戏环境检查和依赖验证
+- 数据目录初始化
+- 职业数据加载（支持JSON文件和默认数据）
+- 玩家数据配置和验证
+- 游戏引擎启动和主窗口切换
+- 错误处理和用户友好的错误提示
+
+技术特点：
+----------
+- 基于Tkinter的跨平台GUI
+- 支持命令行参数处理
+- 完整的错误处理机制
+- 可配置的职业数据系统
+- 响应式界面设计
+
+使用方式：
+----------
+直接运行: python main.py
+命令行帮助: python main.py --help
+测试模式: python main.py --test
+
+作者：财富流游戏开发团队
+版本：v1.0
+更新日期：2024年
 """
 
 import sys
@@ -201,8 +247,14 @@ class GameLauncher:
             
             self.root.destroy()
             
+            # 检查棋盘配置文件
+            config_file = os.path.join(project_root, "data", "board_config.json")
+            if not os.path.exists(config_file):
+                config_file = None
+                print("未找到棋盘配置文件，使用默认配置")
+            
             app = MainWindow()
-            app.game_engine = GameEngine(players_data)
+            app.game_engine = GameEngine(players_data, config_file)
             success, message = app.game_engine.start_game()
             
             if success:

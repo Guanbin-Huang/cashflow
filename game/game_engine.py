@@ -1,6 +1,70 @@
 """
-游戏引擎
+财富流游戏引擎 - Game Engine Core
 控制整个财富流游戏的核心逻辑
+
+文件功能概述：
+==============
+本文件是财富流游戏的核心控制器，负责管理游戏的整个生命周期，
+从游戏初始化到结束的所有逻辑控制。它是连接游戏界面、玩家操作
+和游戏规则的中枢神经系统。
+
+主要组件：
+----------
+1. GamePhase枚举 - 游戏阶段状态
+   - WAITING: 等待开始
+   - PLAYING: 游戏进行中
+   - PAUSED: 游戏暂停
+   - FINISHED: 游戏结束
+
+2. TurnPhase枚举 - 回合阶段状态
+   - ROLL_DICE: 投骰子阶段
+   - MOVE: 移动阶段
+   - SQUARE_EVENT: 格子事件处理阶段
+   - CARD_DECISION: 卡片决策阶段
+   - MARKET: 市场操作阶段
+   - LAYER_TRANSITION: 层级转换阶段
+   - END_TURN: 结束回合阶段
+
+3. GameEngine类 - 游戏主控制器
+   - 游戏状态管理
+   - 玩家轮次控制
+   - 事件触发和处理
+   - 规则验证和执行
+
+核心功能：
+----------
+- 游戏初始化和玩家配置
+- 回合制游戏流程控制
+- 骰子投掷和玩家移动逻辑
+- 格子事件触发和处理
+- 卡片抽取和决策处理
+- 市场交易管理
+- 三层圈转换机制
+- 财务自由判断和游戏胜利条件
+- 游戏日志记录和状态跟踪
+
+技术特点：
+----------
+- 状态机模式管理游戏流程
+- 事件驱动的游戏架构
+- 模块化的组件集成
+- 完整的错误处理机制
+- 可扩展的游戏规则系统
+
+游戏规则实现：
+--------------
+- 支持2-6人游戏
+- 三层圈棋盘系统（内圈、中圈、外圈）
+- 复杂的层级转换规则
+- 多种格子事件处理
+- 投资机会卡片系统
+- 市场买卖机制
+- 裁员、生孩子等生活事件
+- 财务自由胜利条件
+
+作者：财富流游戏开发团队
+版本：v1.0
+更新日期：2024年
 """
 
 import random
@@ -24,20 +88,24 @@ class TurnPhase(Enum):
     SQUARE_EVENT = "格子事件"
     CARD_DECISION = "卡片决策"
     MARKET = "市场操作"
+    LAYER_TRANSITION = "层级转换"  # 新增层级转换阶段
     END_TURN = "结束回合"
 
 class GameEngine:
     """游戏引擎主类"""
     
-    def __init__(self, players_data=None):
+    def __init__(self, players_data=None, config_file=None):
         # 游戏状态
         self.game_phase = GamePhase.WAITING
         self.turn_phase = TurnPhase.ROLL_DICE
         self.turn_count = 0
         self.current_player_index = 0
         
+        # 调试模式
+        self.debug_mode = False
+        
         # 游戏组件
-        self.board = GameBoard()
+        self.board = GameBoard(config_file)
         self.card_manager = CardManager()
         self.players = []
         
@@ -45,6 +113,8 @@ class GameEngine:
         self.current_dice_roll = 0
         self.current_opportunity_card = None
         self.market_mode = False
+        self.layer_transition_active = False  # 是否激活层级转换
+        self.layer_transition_player = None   # 正在转换层级的玩家
         self.game_log = []
         
         # 初始化玩家
@@ -86,6 +156,25 @@ class GameEngine:
         
         return True, f"投出 {self.current_dice_roll} 点"
     
+    def roll_dice_debug(self, dice_value):
+        """调试模式投骰子"""
+        if self.turn_phase != TurnPhase.ROLL_DICE:
+            return False, "现在不是投骰子阶段"
+        
+        if not self.debug_mode:
+            return False, "调试模式未启用"
+        
+        if not (1 <= dice_value <= 6):
+            return False, "骰子点数必须在1-6之间"
+        
+        self.current_dice_roll = dice_value
+        self.turn_phase = TurnPhase.MOVE
+        
+        current_player = self.get_current_player()
+        self.log(f"{current_player.name} 投出了 {self.current_dice_roll} 点")
+        
+        return True, f"投出 {self.current_dice_roll} 点"
+    
     def move_player(self):
         """移动当前玩家"""
         if self.turn_phase != TurnPhase.MOVE:
@@ -93,14 +182,23 @@ class GameEngine:
         
         current_player = self.get_current_player()
         old_position = current_player.position
-        new_position = self.board.get_next_position(old_position, self.current_dice_roll)
+        
+        # 获取玩家当前所在层级
+        current_layer = getattr(current_player, "active_layer", "middle")
+        
+        # 使用当前层级计算新位置
+        new_position = self.board.get_next_position(old_position, self.current_dice_roll, current_layer)
+        
+        # 无论在哪个层级，都设置新位置
         current_player.position = new_position
+        self.log(f"{current_player.name} 从位置 {old_position} 移动到位置 {new_position}: ({current_layer}层)")
         
         self.turn_phase = TurnPhase.SQUARE_EVENT
         
         # 获取新位置的格子
-        square = self.board.get_square(new_position)
-        self.log(f"{current_player.name} 从位置 {old_position} 移动到位置 {new_position}: {square.name}")
+        square = self.board.get_square(current_player.position, getattr(current_player, "active_layer", "middle"))
+        if square:
+            self.log(f"到达: {square.name}")
         
         # 触发格子事件
         return self.trigger_square_event()
@@ -111,7 +209,8 @@ class GameEngine:
             return False, "现在不是格子事件阶段"
         
         current_player = self.get_current_player()
-        square = self.board.get_square(current_player.position)
+        current_layer = getattr(current_player, "active_layer", "middle")
+        square = self.board.get_square(current_player.position, current_layer)
         
         # 处理裁员状态
         if hasattr(current_player, 'downsized_turns') and current_player.downsized_turns > 0:
@@ -130,6 +229,8 @@ class GameEngine:
             self.turn_phase = TurnPhase.CARD_DECISION
         elif square.type.value == "市场" and self.market_mode:
             self.turn_phase = TurnPhase.MARKET
+        elif square.type.value == "层级转换" and self.layer_transition_active:
+            self.turn_phase = TurnPhase.LAYER_TRANSITION
         else:
             self.turn_phase = TurnPhase.END_TURN
         
@@ -205,13 +306,101 @@ class GameEngine:
             return True, "退出市场"
         
         return False, "无效的市场操作"
+        
+    def change_player_layer(self, player, target_layer):
+        """改变玩家所在层级"""
+        if target_layer not in ["inner", "middle", "outer"]:
+            return False, f"无效的层级: {target_layer}"
+        
+        # 记录原层级和位置
+        original_layer = getattr(player, "active_layer", "middle")
+        original_position = player.position
+        
+        # 设置新层级
+        player.active_layer = target_layer
+        
+        # 根据转换规则设置新位置
+        if original_layer == "middle" and target_layer == "inner":
+            # 中层转换到内层：中层18->内层1，中层6->内层9
+            if original_position == 18:
+                player.position = 1
+            elif original_position == 6:
+                player.position = 9
+            else:
+                # 其他位置默认到内层1
+                player.position = 1
+        elif original_layer == "inner" and target_layer == "middle":
+            # 内层位置5（星号*）的转换会在handle_layer_transition中特殊处理
+            # 其他内层位置转换到中层
+            if original_position == 1:
+                player.position = 18
+            elif original_position == 9:
+                player.position = 6
+            else:
+                # 其他位置默认到中层0
+                player.position = 0
+        else:
+            # 其他层级转换默认到起点
+            player.position = 0
+        
+        self.log(f"{player.name} 从 {original_layer} 层级位置 {original_position} 移动到 {target_layer} 层级位置 {player.position}")
+        return True, f"成功切换到 {target_layer} 层级"
+
+    def handle_layer_transition(self, target_layer, target_position=None):
+        """处理层级转换决策"""
+        if not self.layer_transition_active:
+            return False, "当前不在层级转换阶段"
+        
+        if not self.layer_transition_player:
+            return False, "没有要转换层级的玩家"
+        
+        player = self.layer_transition_player
+        current_layer = getattr(player, "active_layer", "middle")
+        
+        # 执行层级切换
+        success = False
+        message = ""
+        
+        # 如果玩家在内层且位于位置5（星号*位置），可以选择中层的任一格子
+        if current_layer == "inner" and player.position == 5 and target_layer == "middle" and target_position is not None:
+            # 设置新层级
+            player.active_layer = "middle"
+            # 设置新位置
+            middle_circle_size = self.board.get_circle_size("middle")
+            if 0 <= target_position < middle_circle_size:
+                player.position = target_position
+                success = True
+                message = f"{player.name} 从内层的*位置移动到中层位置 {target_position}"
+                self.log(message)
+            else:
+                # 无效位置，默认到中层起始点
+                player.position = 0
+                success = True
+                message = f"{player.name} 指定的中层位置无效，移动到中层起始点"
+                self.log(message)
+        else:
+            # 常规层级切换
+            success, message = self.change_player_layer(player, target_layer)
+        
+        # 重置层级转换状态
+        self.layer_transition_active = False
+        self.layer_transition_player = None
+        
+        if success:
+            self.turn_phase = TurnPhase.END_TURN
+        
+        return success, message
     
     def end_turn(self):
         """结束当前回合"""
-        if self.turn_phase != TurnPhase.END_TURN:
+        if self.turn_phase != TurnPhase.END_TURN and self.turn_phase != TurnPhase.LAYER_TRANSITION:
             return False, "回合尚未结束"
         
         current_player = self.get_current_player()
+        
+        # 清除任何可能的层级转换状态
+        self.layer_transition_active = False
+        self.layer_transition_player = None
         
         # 检查财务自由
         if current_player.is_financially_free():
@@ -231,6 +420,8 @@ class GameEngine:
         self.current_dice_roll = 0
         self.current_opportunity_card = None
         self.market_mode = False
+        self.layer_transition_active = False
+        self.layer_transition_player = None
         
         next_player = self.get_current_player()
         self.log(f"轮到 {next_player.name}")
