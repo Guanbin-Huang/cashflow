@@ -1,0 +1,158 @@
+{
+  "cards": [
+    {
+      "id": "ENT001",
+      "type": "企业卡",
+      "name": "小型餐厅",
+      "description": "投资一家小型餐厅，需要管理但回报稳定",
+      "cost": 50000,
+      "down_payment": 10000,
+      "monthly_cash_flow": 1200,
+      "employee_count": 3,
+      "management_required": true
+    },
+    {
+      "id": "ENT002",
+      "type": "企业卡",
+      "name": "洗车店",
+      "description": "开设一家自助洗车店，相对容易管理",
+      "cost": 30000,
+      "down_payment": 6000,
+      "monthly_cash_flow": 800,
+      "employee_count": 1,
+      "management_required": false
+    },
+    {
+      "id": "ENT003",
+      "type": "企业卡",
+      "name": "便利店",
+      "description": "投资便利店特许经营权",
+      "cost": 80000,
+      "down_payment": 16000,
+      "monthly_cash_flow": 2000,
+      "employee_count": 4,
+      "management_required": true
+    },
+    {
+      "id": "OPP001",
+      "type": "机会卡",
+      "name": "出租公寓",
+      "description": "购买一套公寓用于出租投资",
+      "cost": 80000,
+      "down_payment": 16000,
+      "monthly_cash_flow": 800
+    },
+    {
+      "id": "OPP002",
+      "type": "机会卡",
+      "name": "商铺投资",
+      "description": "投资一间小商铺，位置不错",
+      "cost": 120000,
+      "down_payment": 24000,
+      "monthly_cash_flow": 1500
+    },
+    {
+      "id": "OPP003",
+      "type": "机会卡",
+      "name": "停车场投资",
+      "description": "投资一块空地做停车场",
+      "cost": 60000,
+      "down_payment": 12000,
+      "monthly_cash_flow": 600
+    },
+    {
+      "id": "OPP004",
+      "type": "机会卡",
+      "name": "仓储出租",
+      "description": "购买仓库用于出租",
+      "cost": 100000,
+      "down_payment": 20000,
+      "monthly_cash_flow": 1000
+    },
+    {
+      "id": "FIN001",
+      "type": "金融卡",
+      "name": "科技股票基金",
+      "description": "投资科技行业股票基金，高风险高回报",
+      "price_per_share": 100,
+      "dividend_per_share": 3,
+      "min_shares": 10,
+      "max_shares": 1000
+    },
+    {
+      "id": "FIN002",
+      "type": "金融卡",
+      "name": "蓝筹股票",
+      "description": "稳定的大公司股票，收益稳定",
+      "price_per_share": 50,
+      "dividend_per_share": 1,
+      "min_shares": 20,
+      "max_shares": 2000
+    },
+    {
+      "id": "FIN003",
+      "type": "金融卡",
+      "name": "房地产信托",
+      "description": "房地产投资信托基金",
+      "price_per_share": 200,
+      "dividend_per_share": 5,
+      "min_shares": 5,
+      "max_shares": 500
+    },
+    {
+      "id": "FIN004",
+      "type": "金融卡",
+      "name": "债券基金",
+      "description": "稳健的债券投资基金",
+      "price_per_share": 25,
+      "dividend_per_share": 0.5,
+      "min_shares": 50,
+      "max_shares": 5000
+    },
+    {
+      "id": "SIDE001",
+      "type": "副业卡",
+      "name": "网络销售",
+      "description": "开设网络销售副业，销售自制产品",
+      "cost": 2000,
+      "monthly_cash_flow": 400,
+      "time_required_hours": 10
+    },
+    {
+      "id": "SIDE002",
+      "type": "副业卡",
+      "name": "自媒体",
+      "description": "创建自媒体账号，通过广告获得收入",
+      "cost": 1000,
+      "monthly_cash_flow": 300,
+      "time_required_hours": 15
+    },
+    {
+      "id": "SIDE003",
+      "type": "副业卡",
+      "name": "家教服务",
+      "description": "提供家教服务，业余时间赚取收入",
+      "cost": 500,
+      "monthly_cash_flow": 600,
+      "time_required_hours": 20
+    },
+    {
+      "id": "SIDE004",
+      "type": "副业卡",
+      "name": "手工艺品",
+      "description": "制作和销售手工艺品",
+      "cost": 1500,
+      "monthly_cash_flow": 350,
+      "time_required_hours": 12
+    },
+    {
+      "id": "SIDE005",
+      "type": "副业卡",
+      "name": "摄影服务",
+      "description": "提供摄影服务，包括婚礼和活动",
+      "cost": 3000,
+      "monthly_cash_flow": 800,
+      "time_required_hours": 8
+    }
+  ]
+} 

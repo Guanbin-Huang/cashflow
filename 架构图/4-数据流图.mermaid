@@ -1,0 +1,102 @@
+graph LR
+    %% 数据源
+    subgraph data_source [数据源]
+        JSON1[professions.json<br/>职业数据]
+        JSON2[cards.json<br/>卡片数据]
+        USER_INPUT[用户输入<br/>玩家设置]
+    end
+
+    %% 数据处理层
+    subgraph processing_layer [数据处理层]
+        LAUNCHER[GameLauncher<br/>启动器处理]
+        CARD_LOADER[CardManager<br/>卡片加载器]
+        PLAYER_FACTORY[Player Factory<br/>玩家工厂]
+    end
+
+    %% 游戏状态
+    subgraph state_storage [游戏状态存储]
+        GAME_STATE[GameEngine<br/>游戏状态]
+        PLAYERS[Players List<br/>玩家列表]
+        BOARD_STATE[Board State<br/>棋盘状态]
+        CARD_DECK[Card Deck<br/>卡片池]
+    end
+
+    %% 游戏逻辑
+    subgraph logic_processing [游戏逻辑处理]
+        TURN_LOGIC[回合逻辑处理]
+        EVENT_HANDLER[事件处理器]
+        CARD_PROCESSOR[卡片处理器]
+        WIN_CHECKER[胜利条件检查]
+    end
+
+    %% UI显示
+    subgraph user_interface [用户界面]
+        MAIN_UI[MainWindow<br/>主界面]
+        BOARD_DISPLAY[棋盘显示]
+        PLAYER_INFO[玩家信息面板]
+        CONTROL_PANEL[控制面板]
+        LOG_DISPLAY[游戏日志]
+    end
+
+    %% 用户交互
+    subgraph user_interaction [用户交互]
+        BUTTONS[按钮点击]
+        DIALOGS[对话框输入]
+        MENU_ACTIONS[菜单操作]
+    end
+
+    %% 数据流向
+    JSON1 --> LAUNCHER
+    JSON2 --> CARD_LOADER
+    USER_INPUT --> LAUNCHER
+    
+    LAUNCHER --> PLAYER_FACTORY
+    LAUNCHER --> GAME_STATE
+    CARD_LOADER --> CARD_DECK
+    PLAYER_FACTORY --> PLAYERS
+    
+    GAME_STATE --> TURN_LOGIC
+    PLAYERS --> TURN_LOGIC
+    BOARD_STATE --> TURN_LOGIC
+    CARD_DECK --> CARD_PROCESSOR
+    
+    TURN_LOGIC --> EVENT_HANDLER
+    EVENT_HANDLER --> CARD_PROCESSOR
+    CARD_PROCESSOR --> WIN_CHECKER
+    
+    GAME_STATE --> MAIN_UI
+    PLAYERS --> PLAYER_INFO
+    BOARD_STATE --> BOARD_DISPLAY
+    TURN_LOGIC --> CONTROL_PANEL
+    EVENT_HANDLER --> LOG_DISPLAY
+    
+    BUTTONS --> TURN_LOGIC
+    DIALOGS --> CARD_PROCESSOR
+    MENU_ACTIONS --> GAME_STATE
+    
+    %% 反馈循环
+    WIN_CHECKER --> GAME_STATE
+    CARD_PROCESSOR --> PLAYERS
+    EVENT_HANDLER --> BOARD_STATE
+    TURN_LOGIC --> GAME_STATE
+
+    %% 实时更新流
+    GAME_STATE -.->|update| MAIN_UI
+    PLAYERS -.->|refresh| PLAYER_INFO
+    EVENT_HANDLER -.->|log| LOG_DISPLAY
+    TURN_LOGIC -.->|status| CONTROL_PANEL
+
+    %% 样式
+    classDef dataSource fill:#e1f5fe
+    classDef processing fill:#f3e5f5
+    classDef storage fill:#e8f5e8
+    classDef logic fill:#fff3e0
+    classDef ui fill:#fce4ec
+    classDef interaction fill:#f1f8e9
+
+    class JSON1,JSON2,USER_INPUT dataSource
+    class LAUNCHER,CARD_LOADER,PLAYER_FACTORY processing
+    class GAME_STATE,PLAYERS,BOARD_STATE,CARD_DECK storage
+    class TURN_LOGIC,EVENT_HANDLER,CARD_PROCESSOR,WIN_CHECKER logic
+    class MAIN_UI,BOARD_DISPLAY,PLAYER_INFO,CONTROL_PANEL,LOG_DISPLAY ui
+    class BUTTONS,DIALOGS,MENU_ACTIONS interaction 

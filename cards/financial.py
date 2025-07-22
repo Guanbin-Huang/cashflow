@@ -1,0 +1,89 @@
+"""
+金融卡 - 金融产品投资
+包括股票、基金、债券等金融投资产品
+"""
+
+from .base import Card, CardType
+from player import FinancialAsset
+
+class FinancialCard(Card):
+    """金融卡 - 股票、基金等金融产品"""
+    
+    def __init__(self, card_id, name, description, price_per_share, 
+                 dividend_per_share, min_shares=1, max_shares=1000):
+        super().__init__(card_id, name, CardType.FINANCIAL, description)
+        self.price_per_share = price_per_share
+        self.dividend_per_share = dividend_per_share
+        self.min_shares = min_shares
+        self.max_shares = max_shares
+    
+    def can_afford(self, player, shares=None):
+        """检查玩家是否能买得起指定股数"""
+        shares = shares or self.min_shares
+        return player.cash >= (self.price_per_share * shares)
+    
+    def get_required_cash(self, shares=None):
+        """获取购买指定股数所需现金"""
+        shares = shares or self.min_shares
+        return self.price_per_share * shares
+    
+    def execute_purchase(self, player, shares=None):
+        """执行金融产品购买"""
+        shares = shares or self.min_shares
+        
+        if shares < self.min_shares:
+            return False, f"最少需要购买 {self.min_shares} 股"
+        
+        if shares > self.max_shares:
+            return False, f"最多只能购买 {self.max_shares} 股"
+        
+        total_cost = self.price_per_share * shares
+        if player.cash < total_cost:
+            return False, f"资金不足！需要 {total_cost} 现金，当前只有 {player.cash}"
+        
+        # 执行购买
+        player.cash -= total_cost
+        
+        # 创建金融资产
+        financial_asset = FinancialAsset(
+            self.name, 
+            shares, 
+            self.price_per_share, 
+            self.dividend_per_share
+        )
+        player.add_asset(financial_asset)
+        
+        return True, f"成功购买 {shares} 股 {self.name}，总计 {total_cost} 元"
+    
+    def calculate_max_affordable_shares(self, player):
+        """计算玩家最多能买得起多少股"""
+        if self.price_per_share <= 0:
+            return 0
+        max_affordable = int(player.cash // self.price_per_share)
+        return min(max_affordable, self.max_shares)
+    
+    def get_info(self, shares=None):
+        """获取金融产品详细信息"""
+        shares = shares or self.min_shares
+        total_cost = self.price_per_share * shares
+        total_dividend = self.dividend_per_share * shares
+        
+        info = {
+            'name': self.name,
+            'type': self.type.value,
+            'description': self.description,
+            'price_per_share': self.price_per_share,
+            'dividend_per_share': self.dividend_per_share,
+            'min_shares': self.min_shares,
+            'max_shares': self.max_shares,
+            'example_shares': shares,
+            'example_total_cost': total_cost,
+            'example_monthly_dividend': total_dividend,
+            'dividend_yield': (self.dividend_per_share / self.price_per_share * 100) if self.price_per_share > 0 else 0
+        }
+        return info
+    
+    def __str__(self):
+        return (f"{self.type.value}: {self.name} - "
+                f"每股价格: {self.price_per_share}, 每股股息: {self.dividend_per_share}, "
+                f"购买范围: {self.min_shares}-{self.max_shares}股") 

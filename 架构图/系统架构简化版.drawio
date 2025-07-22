@@ -1,0 +1,104 @@
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="财富流游戏架构图" etag="XXX" version="24.0.0" type="device">
+  <diagram id="系统架构图" name="系统架构图">
+    <mxGraphModel dx="1426" dy="763" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- 启动层 -->
+        <mxCell id="startup-layer" value="启动层" style="swimlane;fillColor=#e1f5fe;strokeColor=#01579b;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="50" y="50" width="300" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="main-py" value="main.py&#xa;游戏启动器" style="rounded=1;fillColor=#ffffff;strokeColor=#01579b;" vertex="1" parent="startup-layer">
+          <mxGeometry x="20" y="40" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="launcher" value="GameLauncher&#xa;图形启动器" style="rounded=1;fillColor=#ffffff;strokeColor=#01579b;" vertex="1" parent="startup-layer">
+          <mxGeometry x="120" y="40" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="setup" value="PlayerSetupDialog&#xa;玩家设置" style="rounded=1;fillColor=#ffffff;strokeColor=#01579b;" vertex="1" parent="startup-layer">
+          <mxGeometry x="220" y="40" width="80" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- UI层 -->
+        <mxCell id="ui-layer" value="用户界面层" style="swimlane;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="400" y="50" width="350" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="main-window" value="MainWindow&#xa;主游戏窗口" style="rounded=1;fillColor=#ffffff;strokeColor=#7b1fa2;" vertex="1" parent="ui-layer">
+          <mxGeometry x="20" y="40" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="board-ui" value="棋盘显示&#xa;组件" style="rounded=1;fillColor=#ffffff;strokeColor=#7b1fa2;" vertex="1" parent="ui-layer">
+          <mxGeometry x="120" y="40" width="70" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="control-ui" value="控制面板" style="rounded=1;fillColor=#ffffff;strokeColor=#7b1fa2;" vertex="1" parent="ui-layer">
+          <mxGeometry x="210" y="40" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="info-ui" value="玩家信息&#xa;面板" style="rounded=1;fillColor=#ffffff;strokeColor=#7b1fa2;" vertex="1" parent="ui-layer">
+          <mxGeometry x="290" y="40" width="70" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- 游戏引擎层 -->
+        <mxCell id="engine-layer" value="游戏引擎层" style="swimlane;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="50" y="220" width="300" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="game-engine" value="GameEngine&#xa;游戏引擎" style="rounded=1;fillColor=#ffffff;strokeColor=#2e7d32;" vertex="1" parent="engine-layer">
+          <mxGeometry x="20" y="40" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="phases" value="游戏阶段管理&#xa;GamePhase/TurnPhase" style="rounded=1;fillColor=#ffffff;strokeColor=#2e7d32;" vertex="1" parent="engine-layer">
+          <mxGeometry x="120" y="40" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="logic" value="游戏逻辑&#xa;控制" style="rounded=1;fillColor=#ffffff;strokeColor=#2e7d32;" vertex="1" parent="engine-layer">
+          <mxGeometry x="220" y="40" width="60" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- 游戏对象层 -->
+        <mxCell id="object-layer" value="游戏对象层" style="swimlane;fillColor=#fff3e0;strokeColor=#ef6c00;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="400" y="220" width="350" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="board" value="GameBoard&#xa;游戏棋盘" style="rounded=1;fillColor=#ffffff;strokeColor=#ef6c00;" vertex="1" parent="object-layer">
+          <mxGeometry x="20" y="40" width="70" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="squares" value="Squares&#xa;格子系统" style="rounded=1;fillColor=#ffffff;strokeColor=#ef6c00;" vertex="1" parent="object-layer">
+          <mxGeometry x="110" y="40" width="70" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="player" value="Player&#xa;玩家系统" style="rounded=1;fillColor=#ffffff;strokeColor=#ef6c00;" vertex="1" parent="object-layer">
+          <mxGeometry x="200" y="40" width="70" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cards" value="Cards&#xa;卡片系统" style="rounded=1;fillColor=#ffffff;strokeColor=#ef6c00;" vertex="1" parent="object-layer">
+          <mxGeometry x="290" y="40" width="70" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- 数据层 -->
+        <mxCell id="data-layer" value="数据层" style="swimlane;fillColor=#fce4ec;strokeColor=#c2185b;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="50" y="390" width="250" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="prof-data" value="professions.json&#xa;职业数据" style="rounded=1;fillColor=#ffffff;strokeColor=#c2185b;" vertex="1" parent="data-layer">
+          <mxGeometry x="20" y="40" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="card-data" value="cards.json&#xa;卡片数据" style="rounded=1;fillColor=#ffffff;strokeColor=#c2185b;" vertex="1" parent="data-layer">
+          <mxGeometry x="120" y="40" width="80" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- 连接线 -->
+        <mxCell id="edge1" edge="1" parent="1" source="main-py" target="launcher">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" edge="1" parent="1" source="launcher" target="main-window">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" edge="1" parent="1" source="main-window" target="game-engine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge4" edge="1" parent="1" source="game-engine" target="board">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge5" edge="1" parent="1" source="launcher" target="prof-data">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge6" edge="1" parent="1" source="cards" target="card-data">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile> 

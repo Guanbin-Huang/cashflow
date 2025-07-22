@@ -1,0 +1,100 @@
+{
+  "professions": [
+    {
+      "id": "engineer",
+      "name": "工程师",
+      "salary": 5000,
+      "initial_cash": 10000,
+      "initial_expenses": 2500,
+      "description": "技术工作，收入稳定，有良好的投资潜力"
+    },
+    {
+      "id": "teacher",
+      "name": "教师",
+      "salary": 4000,
+      "initial_cash": 8000,
+      "initial_expenses": 2000,
+      "description": "教育工作者，收入适中，注重稳健投资"
+    },
+    {
+      "id": "doctor",
+      "name": "医生",
+      "salary": 8000,
+      "initial_cash": 15000,
+      "initial_expenses": 4000,
+      "description": "医疗专业人士，高收入高支出"
+    },
+    {
+      "id": "lawyer",
+      "name": "律师",
+      "salary": 7000,
+      "initial_cash": 12000,
+      "initial_expenses": 3500,
+      "description": "法律专业人士，收入较高但工作压力大"
+    },
+    {
+      "id": "nurse",
+      "name": "护士",
+      "salary": 3500,
+      "initial_cash": 7000,
+      "initial_expenses": 1800,
+      "description": "医护人员，收入适中，工作稳定"
+    },
+    {
+      "id": "accountant",
+      "name": "会计师",
+      "salary": 4500,
+      "initial_cash": 9000,
+      "initial_expenses": 2200,
+      "description": "财务专业人士，对投资有一定理解"
+    },
+    {
+      "id": "manager",
+      "name": "经理",
+      "salary": 6000,
+      "initial_cash": 11000,
+      "initial_expenses": 3000,
+      "description": "管理岗位，收入较好，有商业敏感度"
+    },
+    {
+      "id": "salesperson",
+      "name": "销售员",
+      "salary": 3000,
+      "initial_cash": 6000,
+      "initial_expenses": 1500,
+      "description": "销售工作，收入不稳定但有高收入潜力"
+    },
+    {
+      "id": "police",
+      "name": "警察",
+      "salary": 4200,
+      "initial_cash": 8500,
+      "initial_expenses": 2100,
+      "description": "执法人员，收入稳定，工作有风险"
+    },
+    {
+      "id": "mechanic",
+      "name": "技工",
+      "salary": 3800,
+      "initial_cash": 7500,
+      "initial_expenses": 1900,
+      "description": "技术工人，有一技之长，收入稳定"
+    },
+    {
+      "id": "secretary",
+      "name": "秘书",
+      "salary": 2800,
+      "initial_cash": 5500,
+      "initial_expenses": 1400,
+      "description": "办公室工作，收入较低但工作稳定"
+    },
+    {
+      "id": "pilot",
+      "name": "飞行员",
+      "salary": 10000,
+      "initial_cash": 20000,
+      "initial_expenses": 5000,
+      "description": "高技能职业，高收入但培训成本高"
+    }
+  ]
+} 
