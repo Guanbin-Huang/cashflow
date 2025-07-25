@@ -106,7 +106,12 @@ class GameEngine:
         
         # 游戏组件
         self.board = GameBoard(config_file)
+        
+        # 整合同事的企业卡片系统和原有卡片管理器
         self.card_manager = CardManager()
+        from cards.enterprise import EnterpriseCardManager
+        self.enterprise_card_manager = EnterpriseCardManager()
+        
         self.players = []
         
         # 当前状态
@@ -460,6 +465,68 @@ class GameEngine:
             'liabilities_count': len(player.liabilities)
         }
     
+    def handle_enterprise_investment(self, enterprise_id, units=1):
+        """处理企业投资（整合同事的企业卡片系统）"""
+        current_player = self.get_current_player()
+        if not current_player:
+            return False, "没有当前玩家"
+        
+        # 从企业卡片管理器获取卡片
+        enterprise_card = self.enterprise_card_manager.get_card_by_id(enterprise_id)
+        if not enterprise_card:
+            return False, f"找不到企业卡片: {enterprise_id}"
+        
+        # 检查玩家是否能负担
+        if not enterprise_card.can_afford(current_player.cash):
+            return False, f"资金不足！需要 {enterprise_card.down_payment:,}元"
+        
+        # 检查精力
+        player_energy = getattr(current_player, 'energy', 10)
+        if not enterprise_card.has_enough_energy(player_energy):
+            return False, f"精力不足！需要 {abs(enterprise_card.energy_cost)} 点精力"
+        
+        # 执行投资
+        success, message = enterprise_card.execute_purchase(current_player, units)
+        
+        if success:
+            self.log(f"{current_player.name} {message}")
+            
+            # 更新玩家的详细财务报表
+            if hasattr(current_player, 'print_detailed_summary'):
+                print(f"\n=== {current_player.name} 投资后财务状况 ===")
+                current_player.print_detailed_summary()
+        
+        return success, message
+    
+    def get_affordable_enterprise_cards(self):
+        """获取当前玩家可负担的企业卡片"""
+        current_player = self.get_current_player()
+        if not current_player:
+            return []
+        
+        player_energy = getattr(current_player, 'energy', 10)
+        return self.enterprise_card_manager.filter_affordable_cards(
+            current_player.cash, player_energy
+        )
+    
+    def print_enterprise_investment_analysis(self):
+        """打印企业投资分析（整合同事的分析功能）"""
+        print("\n=== 企业投资机会分析 ===")
+        self.enterprise_card_manager.print_investment_analysis()
+        
+        current_player = self.get_current_player()
+        if current_player:
+            affordable_cards = self.get_affordable_enterprise_cards()
+            print(f"\n当前玩家 {current_player.name} 可负担的企业卡片: {len(affordable_cards)} 张")
+            
+            for index, card in affordable_cards[:3]:  # 显示前3张
+                roi = card.calculate_roi()
+                efficiency = card.calculate_energy_efficiency()
+                print(f"  {index+1}. {card.enterprise_name}: "
+                      f"首付{card.down_payment:,}元, "
+                      f"年化{roi:.1f}%, "
+                      f"效率{efficiency:.0f}元/精力")
+
     def log(self, message):
         """记录游戏日志"""
         self.game_log.append(f"回合{self.turn_count}: {message}")

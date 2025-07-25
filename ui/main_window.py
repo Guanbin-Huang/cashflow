@@ -252,7 +252,7 @@ class MainWindow:
         
         # 玩家列表
         self.player_tree = ttk.Treeview(player_frame, columns=("现金", "被动收入", "支出", "层级"), 
-                                      show="tree headings", height=10)
+                                      show="tree headings", height=8)
         self.player_tree.heading("#0", text="玩家")
         self.player_tree.heading("现金", text="现金")
         self.player_tree.heading("被动收入", text="被动收入")
@@ -266,6 +266,17 @@ class MainWindow:
         self.player_tree.column("层级", width=60)
         
         self.player_tree.pack(fill=tk.BOTH, expand=True)
+        
+        # 添加财务报表按钮
+        report_frame = ttk.Frame(player_frame)
+        report_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        ttk.Button(report_frame, text="查看损益表", 
+                  command=self.show_income_statement).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(report_frame, text="查看资产负债表", 
+                  command=self.show_balance_sheet).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(report_frame, text="企业投资分析", 
+                  command=self.show_enterprise_analysis).pack(side=tk.LEFT)
         
         # 滚动条
         player_scrollbar = ttk.Scrollbar(player_frame, orient="vertical", 
@@ -851,6 +862,261 @@ class MainWindow:
    - 副业卡：小投入快回报的副业
         """
         messagebox.showinfo("游戏规则", rules)
+    
+    def show_income_statement(self):
+        """显示当前玩家的损益表"""
+        if not self.game_engine:
+            messagebox.showwarning("警告", "游戏尚未开始")
+            return
+        
+        current_player = self.game_engine.get_current_player()
+        if not current_player:
+            messagebox.showwarning("警告", "没有当前玩家")
+            return
+        
+        if not hasattr(current_player, 'income_statement'):
+            messagebox.showwarning("警告", "玩家财务系统未初始化")
+            return
+        
+        # 创建新窗口显示损益表
+        income_window = tk.Toplevel(self.root)
+        income_window.title(f"{current_player.name} - 损益表")
+        income_window.geometry("600x500")
+        
+        # 创建滚动文本框
+        text_frame = ttk.Frame(income_window)
+        text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        text_widget = tk.Text(text_frame, font=("Courier", 10))
+        scrollbar = ttk.Scrollbar(text_frame, orient=tk.VERTICAL, command=text_widget.yview)
+        text_widget.configure(yscrollcommand=scrollbar.set)
+        
+        text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # 获取损益表数据并格式化显示
+        income_data = current_player.income_statement.get_data()
+        self._format_income_statement(text_widget, income_data)
+        
+        text_widget.config(state=tk.DISABLED)
+    
+    def show_balance_sheet(self):
+        """显示当前玩家的资产负债表"""
+        if not self.game_engine:
+            messagebox.showwarning("警告", "游戏尚未开始")
+            return
+        
+        current_player = self.game_engine.get_current_player()
+        if not current_player:
+            messagebox.showwarning("警告", "没有当前玩家")
+            return
+        
+        if not hasattr(current_player, 'balance_sheet'):
+            messagebox.showwarning("警告", "玩家财务系统未初始化")
+            return
+        
+        # 创建新窗口显示资产负债表
+        balance_window = tk.Toplevel(self.root)
+        balance_window.title(f"{current_player.name} - 资产负债表")
+        balance_window.geometry("600x500")
+        
+        # 创建滚动文本框
+        text_frame = ttk.Frame(balance_window)
+        text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        text_widget = tk.Text(text_frame, font=("Courier", 10))
+        scrollbar = ttk.Scrollbar(text_frame, orient=tk.VERTICAL, command=text_widget.yview)
+        text_widget.configure(yscrollcommand=scrollbar.set)
+        
+        text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # 获取资产负债表数据并格式化显示
+        balance_data = current_player.balance_sheet.get_data()
+        self._format_balance_sheet(text_widget, balance_data)
+        
+        text_widget.config(state=tk.DISABLED)
+    
+    def show_enterprise_analysis(self):
+        """显示企业投资分析"""
+        if not self.game_engine:
+            messagebox.showwarning("警告", "游戏尚未开始")
+            return
+        
+        # 创建新窗口显示企业分析
+        analysis_window = tk.Toplevel(self.root)
+        analysis_window.title("企业投资分析")
+        analysis_window.geometry("800x600")
+        
+        # 创建滚动文本框
+        text_frame = ttk.Frame(analysis_window)
+        text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        text_widget = tk.Text(text_frame, font=("Courier", 10))
+        scrollbar = ttk.Scrollbar(text_frame, orient=tk.VERTICAL, command=text_widget.yview)
+        text_widget.configure(yscrollcommand=scrollbar.set)
+        
+        text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # 重定向输出到文本框
+        import sys
+        from io import StringIO
+        
+        old_stdout = sys.stdout
+        sys.stdout = StringIO()
+        
+        try:
+            # 调用企业投资分析方法
+            self.game_engine.print_enterprise_investment_analysis()
+            output = sys.stdout.getvalue()
+        finally:
+            sys.stdout = old_stdout
+        
+        text_widget.insert(tk.END, output)
+        text_widget.config(state=tk.DISABLED)
+    
+    def _format_income_statement(self, text_widget, data):
+        """格式化损益表数据"""
+        text_widget.insert(tk.END, "=" * 50 + "\n")
+        text_widget.insert(tk.END, "                损益表\n")
+        text_widget.insert(tk.END, "=" * 50 + "\n\n")
+        
+        # 收入部分
+        text_widget.insert(tk.END, "收入:\n")
+        text_widget.insert(tk.END, "-" * 30 + "\n")
+        
+        # 主动收入
+        text_widget.insert(tk.END, "  主动收入:\n")
+        active_income = data["收入"]["主动收入"]
+        
+        # 工作收入
+        work_income = active_income["工作收入"]
+        if work_income["本人工资"]["现金流"] > 0:
+            text_widget.insert(tk.END, f"    本人工资: {work_income['本人工资']['现金流']:,}元\n")
+        if work_income["配偶工资"]["现金流"] > 0:
+            text_widget.insert(tk.END, f"    配偶工资: {work_income['配偶工资']['现金流']:,}元\n")
+        
+        # 副业收入
+        side_business = active_income["副业收入"]
+        for name, info in side_business.items():
+            text_widget.insert(tk.END, f"    {name}: {info['现金流']:,}元\n")
+        
+        # 被动收入
+        text_widget.insert(tk.END, "  被动收入:\n")
+        passive_income = data["收入"]["被动收入"]
+        
+        for category, investments in passive_income.items():
+            if investments:  # 如果有投资
+                text_widget.insert(tk.END, f"    {category}:\n")
+                for name, info in investments.items():
+                    text_widget.insert(tk.END, f"      {name}: {info['现金流']:,}元\n")
+        
+        text_widget.insert(tk.END, f"\n  总收入: {data['收入']['总收入']:,}元\n\n")
+        
+        # 支出部分
+        text_widget.insert(tk.END, "支出:\n")
+        text_widget.insert(tk.END, "-" * 30 + "\n")
+        
+        expenses = data["支出"]
+        for category, info in expenses.items():
+            if category != "总支出" and category != "生活支出":
+                if info["总花费"] > 0:
+                    text_widget.insert(tk.END, f"  {category}: {info['总花费']:,}元\n")
+        
+        # 生活支出详细
+        life_expenses = expenses["生活支出"]
+        if any(life_expenses[key]["总花费"] > 0 for key in ["孩子", "本人", "配偶"]):
+            text_widget.insert(tk.END, "  生活支出:\n")
+            if life_expenses["本人"]["总花费"] > 0:
+                text_widget.insert(tk.END, f"    本人: {life_expenses['本人']['总花费']:,}元\n")
+            if life_expenses["配偶"]["总花费"] > 0:
+                text_widget.insert(tk.END, f"    配偶: {life_expenses['配偶']['总花费']:,}元\n")
+            if life_expenses["孩子"]["总花费"] > 0:
+                text_widget.insert(tk.END, f"    孩子({life_expenses['孩子']['个数']}个): {life_expenses['孩子']['总花费']:,}元\n")
+        
+        text_widget.insert(tk.END, f"\n  总支出: {expenses['总支出']:,}元\n")
+        
+        # 净收入
+        text_widget.insert(tk.END, "\n" + "=" * 30 + "\n")
+        net_income = data["净收入"]
+        text_widget.insert(tk.END, f"净收入: {net_income:,}元\n")
+        
+        if net_income >= 0:
+            text_widget.insert(tk.END, "财务状况: 盈余\n")
+        else:
+            text_widget.insert(tk.END, "财务状况: 亏损\n")
+    
+    def _format_balance_sheet(self, text_widget, data):
+        """格式化资产负债表数据"""
+        text_widget.insert(tk.END, "=" * 50 + "\n")
+        text_widget.insert(tk.END, "              资产负债表\n")
+        text_widget.insert(tk.END, "=" * 50 + "\n\n")
+        
+        # 资产部分
+        text_widget.insert(tk.END, "资产:\n")
+        text_widget.insert(tk.END, "-" * 30 + "\n")
+        
+        assets = data["资产"]
+        
+        # 银行存款
+        if assets["银行存款"]["金额"] > 0:
+            text_widget.insert(tk.END, f"  银行存款: {assets['银行存款']['金额']:,}元\n")
+        
+        # 觉察投资
+        awareness_investments = assets["觉察投资"]
+        if awareness_investments:
+            text_widget.insert(tk.END, "  觉察投资:\n")
+            for name, info in awareness_investments.items():
+                text_widget.insert(tk.END, f"    {name}: {info['权益']:,}元\n")
+        
+        # 股票投资
+        stock_investments = assets["股票投资"]
+        if stock_investments:
+            text_widget.insert(tk.END, "  股票投资:\n")
+            for name, info in stock_investments.items():
+                value = info["每股成本"] * info["股数"]
+                text_widget.insert(tk.END, f"    {name}({info['股票代码']}): {value:,}元 ({info['股数']}股)\n")
+        
+        text_widget.insert(tk.END, f"\n  总资产: {assets['总资产']:,}元\n\n")
+        
+        # 负债部分
+        text_widget.insert(tk.END, "负债:\n")
+        text_widget.insert(tk.END, "-" * 30 + "\n")
+        
+        liabilities = data["负债"]
+        
+        # 固定负债
+        fixed_liabilities = ["自住房抵押贷款", "购车贷款", "信用卡负债", "额外负债", "银行贷款"]
+        for liability in fixed_liabilities:
+            if liabilities[liability]["金额"] > 0:
+                text_widget.insert(tk.END, f"  {liability}: {liabilities[liability]['金额']:,}元\n")
+        
+        # 房产抵押贷款
+        real_estate_loans = liabilities["房产抵押贷款"]
+        if real_estate_loans:
+            text_widget.insert(tk.END, "  房产抵押贷款:\n")
+            for name, info in real_estate_loans.items():
+                text_widget.insert(tk.END, f"    {name}({info['代码']}): {info['金额']:,}元\n")
+        
+        # 企业负债
+        business_debts = liabilities["企业负债"]
+        if business_debts:
+            text_widget.insert(tk.END, "  企业负债:\n")
+            for name, info in business_debts.items():
+                text_widget.insert(tk.END, f"    {name}({info['代码']}): {info['金额']:,}元\n")
+        
+        text_widget.insert(tk.END, f"\n  总负债: {liabilities['总负债']:,}元\n")
+        
+        # 净资产
+        text_widget.insert(tk.END, "\n" + "=" * 30 + "\n")
+        net_assets = data["净资产"]
+        text_widget.insert(tk.END, f"净资产: {net_assets:,}元\n")
+        
+        if net_assets >= 0:
+            text_widget.insert(tk.END, "财务状况: 正资产\n")
+        else:
+            text_widget.insert(tk.END, "财务状况: 资不抵债\n")
     
     def show_about(self):
         """显示关于信息"""

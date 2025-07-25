@@ -84,6 +84,10 @@ Player类用于模拟"穷爸爸富爸爸"财富流游戏中的玩家
 更新日期：2024年
 """
 
+# 导入标准化的财务报表系统
+from .income_statement import IncomeStatement
+from .balance_sheet import BalanceSheet
+
 class Player:
     """
     玩家类，适用于穷爸爸富爸爸的财富流游戏。
@@ -110,6 +114,64 @@ class Player:
         self.passive_income = passive_income
         self.expenses = expenses
         self.income_history = []
+        
+        # 整合同事的财务报表系统
+        self.income_statement = IncomeStatement()
+        self.balance_sheet = BalanceSheet()
+        
+        # 初始化财务数据
+        self._sync_financial_data()
+
+    def _sync_financial_data(self):
+        """同步财务数据到报表系统"""
+        # 更新损益表
+        self.income_statement.update_data(
+            income_data={
+                "主动收入": {
+                    "工作收入": {
+                        "本人工资": {"现金流": self.salary}
+                    }
+                }
+            },
+            expense_data={}
+        )
+        
+        # 更新资产负债表
+        self.balance_sheet.update_data(
+            asset_data={
+                "银行存款": {"金额": self.cash}
+            }
+        )
+    
+    def get_detailed_financial_summary(self):
+        """获取详细的财务摘要（包含报表数据）"""
+        return {
+            "基本信息": {
+                "姓名": self.name,
+                "职业": self.profession,
+                "现金": self.cash,
+                "被动收入": self.passive_income,
+                "支出": self.expenses
+            },
+            "损益表": self.income_statement.get_data(),
+            "资产负债表": self.balance_sheet.get_data()
+        }
+    
+    def print_detailed_summary(self):
+        """打印详细的财务摘要"""
+        print(f"=== {self.name} 财务状况 ===")
+        print(f"职业: {self.profession}")
+        print(f"现金: {self.cash:,}")
+        print(f"工资: {self.salary:,}")
+        print(f"被动收入: {self.passive_income:,}")
+        print(f"支出: {self.expenses:,}")
+        print(f"财务自由: {'是' if self.is_financially_free() else '否'}")
+        
+        print("\n=== 损益表摘要 ===")
+        self.income_statement.print_summary()
+        
+        print("\n=== 资产负债表摘要 ===")
+        self.balance_sheet.print_summary()
 
     def add_asset(self, asset):
         """
@@ -119,6 +181,9 @@ class Player:
         self.assets.append(asset)
         if hasattr(asset, 'passive_income'):
             self.passive_income += asset.passive_income
+        
+        # 同步到财务报表系统
+        self._sync_financial_data()
 
     def add_liability(self, liability):
         """
@@ -128,6 +193,9 @@ class Player:
         self.liabilities.append(liability)
         if hasattr(liability, 'expense'):
             self.expenses += liability.expense
+        
+        # 同步到财务报表系统  
+        self._sync_financial_data()
 
     def receive_salary(self):
         """
@@ -135,6 +203,11 @@ class Player:
         """
         self.cash += self.salary
         self.income_history.append(('salary', self.salary))
+        
+        # 更新资产负债表中的银行存款
+        self.balance_sheet.update_data(
+            asset_data={"银行存款": {"金额": self.cash}}
+        )
 
     def receive_passive_income(self):
         """
@@ -142,6 +215,11 @@ class Player:
         """
         self.cash += self.passive_income
         self.income_history.append(('passive_income', self.passive_income))
+        
+        # 更新资产负债表中的银行存款
+        self.balance_sheet.update_data(
+            asset_data={"银行存款": {"金额": self.cash}}
+        )
 
     def pay_expenses(self):
         """
@@ -149,6 +227,11 @@ class Player:
         """
         self.cash -= self.expenses
         self.income_history.append(('expenses', -self.expenses))
+        
+        # 更新资产负债表中的银行存款
+        self.balance_sheet.update_data(
+            asset_data={"银行存款": {"金额": self.cash}}
+        )
 
     def buy_asset(self, asset, price):
         """
