@@ -665,7 +665,7 @@ class MainWindow:
                     square = self.game_engine.board.get_square(i, layer_name)
                     
                     # 根据格子类型选择颜色
-                    fill_color = "white"
+                    fill_color = self.game_engine.board.get_square_color(square.type) if square else "white"
                     
                     # 绘制格子
                     self.board_canvas.create_oval(x-15, y-15, x+15, y+15, 
@@ -804,7 +804,7 @@ class MainWindow:
             square = self.game_engine.board.get_square(i, "inner")
             
             # 根据格子类型选择颜色
-            fill_color = "white"
+            fill_color = self.game_engine.board.get_square_color(square.type) if square else "white"
             
             # 为星号格子(5)添加特殊标记
             if i == 5:

@@ -222,6 +222,22 @@ class GameBoard:
         self.circle_sizes = self.config.get("circle_sizes", self.circle_sizes)
         self.circle_colors = self.config.get("circle_colors", self.circle_colors)
         
+        # 加载格子颜色配置
+        self.square_colors = self.config.get("square_colors", {
+            "OPPORTUNITY": "blue",
+            "MARKET": "green",
+            "BABY": "pink", 
+            "PAYCHECK": "yellow",
+            "CHARITY": "purple",
+            "LAYER_TRANSITION": "gray",
+            "DOODAD": "red",
+            "DOWNSIZED": "gray",
+            "START": "gold"
+        })
+        
+        # 调试信息：打印加载的颜色配置
+        print("Loaded square colors:", self.square_colors)
+        
         # 创建格子类型映射
         square_classes = {
             "START": StartSquare,
@@ -307,6 +323,17 @@ class GameBoard:
     def get_circle_color(self, layer="middle"):
         """获取圈层颜色"""
         return self.circle_colors.get(layer, "black")
+    
+    def get_square_color(self, square_type):
+        """获取格子类型对应的颜色"""
+        # 如果传入的是字符串，直接查找
+        if isinstance(square_type, str):
+            return self.square_colors.get(square_type, "white")
+        # 如果传入的是枚举类型，获取其名称而不是值
+        color = self.square_colors.get(square_type.name, "white")
+        # 调试信息：打印枚举名称和对应颜色
+        print(f"Square type: {square_type.name}, Color: {color}")
+        return color
     
     def get_squares_by_type(self, square_type, layer="middle"):
         """获取指定类型的所有格子 (向后兼容)"""
